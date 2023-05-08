@@ -13,4 +13,3 @@ Router for [rocky7](https://github.com/abhishiv/rocky7)
 ## Ecosystem
 
 - [rocky7](https://github.com/abhishiv/rocky7)
-- [rocky7-apollo](https://github.com/abhishiv/rocky7-apollo)
