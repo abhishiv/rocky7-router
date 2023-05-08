@@ -1,0 +1,46 @@
+{
+  "name": "rocky7-router",
+  "version": "0.0.32",
+  "author": "Abhishiv Saxena<abhishiv@gmail.com>",
+  "license": "MIT",
+  "description": "rocky7 router",
+  "keywords": [
+    "rocky7",
+    "router",
+    "framework"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abhishiv/rocky7-router"
+  },
+  "files": [
+    "./dist"
+  ],
+  "devDependencies": {
+    "typescript": "^4.9.5",
+    "vite": "^4.1.4",
+    "vitest": "^0.28.5"
+  },
+  "scripts": {
+    "build": "npx tsc --resolveJsonModule -p ./tsconfig.json --outDir ./dist/esm && npx tsc --resolveJsonModule -p ./tsconfig.json --module commonjs --outDir ./dist/cjs",
+    "test": "npx vitest --run --passWithNoTests",
+    "coverage": "vitest run --coverage --run --passWithNoTests"
+  },
+  "main": "./src/index.tsx",
+  "exports": {
+    ".": {
+      "import": "./src/index.tsx",
+      "require": "./src/index.tsx"
+    },
+    "./example": {
+      "import": "./src/example.tsx",
+      "require": "./src/example.tsx"
+    }
+  },
+  "dependencies": {
+    "regexparam": "^2.0.1"
+  },
+  "peerDependencies": {
+    "rocky7": "*"
+  }
+}
