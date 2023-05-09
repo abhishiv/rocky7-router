@@ -30,6 +30,11 @@ class RouterObject extends EventTarget {
     super();
     this.history = history;
     this.location = location;
+    if (typeof window !== "undefined") {
+      window.addEventListener("popstate", (e) => {
+        this.dispatchEvent(new Event("popstate"));
+      });
+    }
   }
   pushState(state: Record<string, any>, empty: "", path: string) {
     this.history.pushState(state, empty, path);
@@ -164,6 +169,21 @@ function matchRoutes(
   // Return null if no matching route is found
   return undefined;
 }
+
+export const BrowserRouter = component(
+  "rocky7-router.Browser",
+  (props, { createContext, signal }) => {
+    createContext(
+      RouterContext,
+      signal("router", createRouter(window.history, window.location))
+    );
+    return props.children;
+  }
+);
+
+export const StaticRouter = component("rocky7-router.Static", (props) => {
+  return props.children;
+});
 
 export const Link = component(
   "Router.Link",
