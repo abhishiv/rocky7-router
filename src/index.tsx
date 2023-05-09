@@ -75,7 +75,7 @@ export const Route = component<{
 export const Switch = component(
   "rocky7.Router.Switch",
   (
-    props: { children: VElement[] },
+    props: { children: VElement[]; onChange?: Function },
     { signal, wire, getContext, createContext, utils }
   ) => {
     const activeRouteSignal = signal<null | any>("active", null);
@@ -111,6 +111,7 @@ export const Switch = component(
           parents: [],
         };
         activeRouteSignal(currentRoute);
+        if (props.onChange) props.onChange(currentRoute);
       }
     };
 
@@ -173,8 +174,11 @@ export const Link = component(
       <a
         {...props}
         onClick={(e) => {
-          const r = router();
           e.preventDefault();
+          if (!router) {
+            throw new Error("Please define root router");
+          }
+          const r = router();
           r.pushState({}, "", props.href);
           if (props.onClick) {
             props.onClick(e);
