@@ -40,6 +40,20 @@ class RouterObject extends EventTarget {
     this.history.pushState(state, empty, path);
     this.dispatchEvent(new Event("popstate"));
   }
+  navigate(path: string) {
+    this.pushState({}, "", path);
+  }
+  getQuery() {
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    console.log(query, vars);
+    const obj: Record<string, string> = {};
+    for (var i = 0; i < vars.length; i++) {
+      var pair = vars[i].split("=");
+      obj[pair[0]] = decodeURIComponent(pair[1]);
+    }
+    return obj;
+  }
 }
 
 export function createRouter(
