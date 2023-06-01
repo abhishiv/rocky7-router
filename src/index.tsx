@@ -84,12 +84,12 @@ export const Switch = component(
   "rocky7.Router.Switch",
   (
     props: { children: VElement[]; onChange?: Function },
-    { signal, wire, getContext, createContext, utils }
+    { signal, wire, getContext, setContext, utils }
   ) => {
     const $activeRoute = signal<null | any>("active", null);
 
+    setContext(ParentRouteContext, $activeRoute);
     const $ownerRoute = getContext(ParentRouteContext);
-    createContext(ParentRouteContext, $activeRoute);
 
     const $router = getContext(RouterContext);
     const router = $router();
@@ -110,14 +110,19 @@ export const Switch = component(
       route?: { path: string };
       params?: Record<string, string>;
     } = {}) => {
-      //console.log("updateActiveRoute", route);
+      console.log("updateActiveRoute", route);
       if (route) {
         const currentRoute: ParentRouteObject = {
           pathname: route.path,
           parent: $ownerRoute ? $ownerRoute() : undefined,
         };
-
+        console.log(
+          "currentRoute",
+          currentRoute,
+          $ownerRoute ? $ownerRoute() : undefined
+        );
         $activeRoute(currentRoute);
+        console.log($activeRoute());
         if (props.onChange) props.onChange(currentRoute);
       }
     };
@@ -131,22 +136,6 @@ export const Switch = component(
       matchRoutes($ownerRoute ? $ownerRoute() : undefined, router, routes)
     );
     return props.children as any;
-
-    //    return wire(($: any) => {
-    //      const activeRoute = activeRouteSignal($);
-    //      console.log({ activeRoute });
-    //      if (activeRoute) {
-    //        const activeRouteElement = props.children.find(
-    //          (el) => (el as any).p.path === activeRoute.pathname
-    //        );
-    //        console.log(activeRouteElement);
-    //        if (activeRouteElement) {
-    //          const Component = (activeRouteElement as any).p.component;
-    //          console.log("Component", Component);
-    //          return h(Component, {});
-    //        }
-    //      }
-    //    });
   }
 );
 
@@ -188,8 +177,8 @@ function matchRoutes(
 
 export const BrowserRouter = component(
   "rocky7-router.Browser",
-  (props, { createContext, signal }) => {
-    createContext(
+  (props, { setContext, signal }) => {
+    setContext(
       RouterContext,
       signal("router", createRouter(window.history, window.location))
     );
