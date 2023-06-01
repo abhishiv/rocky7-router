@@ -81,5 +81,3 @@ export const ProfileSettingsDelete = component<{}>(
     return <div>ProfileSettingsDelete</div>;
   }
 );
-
-render(<Layout />, document.body);
