@@ -17,8 +17,9 @@ export type ParentRouteObject = {
   pathname: string;
   parents: ParentRouteObject[];
 };
-export const RouterContext = defineContext<RouterObject>();
-export const ParentRouteContext = defineContext<ParentRouteObject>();
+export const RouterContext = defineContext<RouterObject>("RouterObject");
+export const ParentRouteContext =
+  defineContext<ParentRouteObject>("ParentRouteObject");
 
 export type History = typeof window.history;
 export type Location = typeof window.location;
@@ -65,7 +66,7 @@ export function createRouter(
 
 export const Route = component<{
   path: string;
-  component: Component | h.JSX.Element | { (props: any): h.JSX.Element };
+  component: Component<any> | h.JSX.Element;
 }>("rocky7.Router.Route", (props, { signal, wire, getContext, utils }) => {
   const ownerRouteSignal = getContext<{ pathname: string }>(ParentRouteContext);
   //  console.log("ownerRoute", ownerRouteSignal().pathname, props.path);
