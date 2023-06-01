@@ -21,7 +21,7 @@ export const Layout = component<{}>("Layout", (props, {}) => {
             <Link href="/profile/settings">Profile Settings</Link>
           </li>
           <li>
-            <Link href="/profile/settings/delete">Profile Delete</Link>
+            <Link href="/profile/settings/dele">Profile Delete</Link>
           </li>
         </ul>
         <Switch>
