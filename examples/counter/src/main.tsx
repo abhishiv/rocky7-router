@@ -20,6 +20,9 @@ export const Layout = component<{}>("Layout", (props, {}) => {
           <li>
             <Link href="/profile/settings">Profile Settings</Link>
           </li>
+          <li>
+            <Link href="/profile/settings/delete">Profile Delete</Link>
+          </li>
         </ul>
         <Switch>
           <Route path="" component={Home} />
@@ -56,7 +59,27 @@ export const ProfileIndex = component<{}>("ProfileIndex", (props, {}) => {
 });
 
 export const ProfileSettings = component<{}>("ProfileSettings", (props, {}) => {
-  return <div>ProfileSettings</div>;
+  return (
+    <div>
+      ProfileSettings
+      <Switch>
+        <Route path="" component={ProfileSettingsIndex} />
+        <Route path="delete" component={ProfileSettingsDelete} />
+      </Switch>
+    </div>
+  );
 });
+export const ProfileSettingsIndex = component<{}>(
+  "ProfileSettingsIndex",
+  (props, {}) => {
+    return <div>ProfileSettingsIndex</div>;
+  }
+);
+export const ProfileSettingsDelete = component<{}>(
+  "ProfileSettingsDelete",
+  (props, {}) => {
+    return <div>ProfileSettingsDelete</div>;
+  }
+);
 
 render(<Layout />, document.body);

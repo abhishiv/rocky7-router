@@ -7,16 +7,15 @@ import {
   VElement,
   Component,
   When,
-  Signal,
 } from "rocky7";
 //import { pathToRegexp } from "path-to-regex";
-import { parse, inject } from "regexparam";
+import { parse } from "regexparam";
 
 // Example usage
 export type ParentRouteObject =
   | {
       pathname: string;
-      parents: ParentRouteObject[];
+      parent: ParentRouteObject;
     }
   | undefined;
 export const RouterContext = defineContext<RouterObject>("RouterObject");
@@ -89,13 +88,11 @@ export const Switch = component(
   ) => {
     const $activeRoute = signal<null | any>("active", null);
     // todo: remove typecast
-    createContext(ParentRouteContext, $activeRoute);
     const $ownerRoute = getContext(ParentRouteContext);
+    createContext(ParentRouteContext, $activeRoute);
 
     const $router = getContext(RouterContext);
     const router = $router();
-
-    const ownerRoute = $ownerRoute ? $ownerRoute() : undefined;
 
     const routes = props.children
       .map((el) => ({
@@ -115,9 +112,9 @@ export const Switch = component(
     } = {}) => {
       console.log("updateActiveRoute", route);
       if (route) {
-        const currentRoute = {
+        const currentRoute: ParentRouteObject = {
           pathname: route.path,
-          parents: [],
+          parent: $ownerRoute ? $ownerRoute() : undefined,
         };
 
         $activeRoute(currentRoute);
@@ -126,9 +123,13 @@ export const Switch = component(
     };
 
     router.addEventListener("popstate", () =>
-      updateActiveRoute(matchRoutes(router, routes))
+      updateActiveRoute(
+        matchRoutes($ownerRoute ? $ownerRoute() : undefined, router, routes)
+      )
     );
-    updateActiveRoute(matchRoutes(router, routes));
+    updateActiveRoute(
+      matchRoutes($ownerRoute ? $ownerRoute() : undefined, router, routes)
+    );
     return props.children as any;
 
     //    return wire(($: any) => {
@@ -151,15 +152,21 @@ export const Switch = component(
 
 // Function to find the matching route for a given pathname
 function matchRoutes(
+  parentRoute: ParentRouteObject | undefined,
   router: RouterObject,
   routes: { component: Component; path: string }[]
 ) {
-  const pathname = router.location.pathname;
-  console.log("matchRoutes", pathname, routes);
+  let pathname = router.location.pathname.slice(1);
+  const parentPath = parentRoute ? parentRoute.pathname : undefined;
+  console.log(pathname, parentPath);
+  if (parentPath)
+    pathname = pathname.replace(new RegExp("^" + parentPath + ""), "");
+  console.log("matchRoutes", parentPath, pathname, routes);
   for (const route of routes) {
-    const regexp = parse(route.path);
-    const match = regexp.pattern.exec(pathname);
-
+    const regexp = parse("/" + route.path);
+    console.log("p", "/" + pathname, "/" + route.path);
+    const match = regexp.pattern.exec("/" + pathname);
+    console.log("match", match);
     if (match) {
       // Extract the parameters from the matched route
       const params = {};
