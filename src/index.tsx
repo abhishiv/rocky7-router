@@ -110,19 +110,14 @@ export const Switch = component(
       route?: { path: string };
       params?: Record<string, string>;
     } = {}) => {
-      console.log("updateActiveRoute", route);
+      //console.log("updateActiveRoute", route);
       if (route) {
         const currentRoute: ParentRouteObject = {
           pathname: route.path,
           parent: $ownerRoute ? $ownerRoute() : undefined,
         };
-        console.log(
-          "currentRoute",
-          currentRoute,
-          $ownerRoute ? $ownerRoute() : undefined
-        );
         $activeRoute(currentRoute);
-        console.log($activeRoute());
+        //console.log($activeRoute());
         if (props.onChange) props.onChange(currentRoute);
       }
     };
@@ -148,18 +143,18 @@ function matchRoutes(
   let pathname = router.location.pathname.slice(1);
 
   //let parentPath : string|undefined = undefined
-  console.log("parentRoute", parentRoute);
+  //console.log("parentRoute", parentRoute);
   const parentPath = parentRoute ? parentRoute.pathname : undefined;
   //console.log(pathname, parentPath);
   if (parentPath)
     pathname = pathname.replace(new RegExp("^" + parentPath + ""), "");
   if (pathname[0] === "/") pathname = pathname.slice(1);
-  console.log("matchRoutes", parentPath, pathname, routes);
+  //console.log("matchRoutes", parentPath, pathname, routes);
   for (const route of routes) {
     const regexp = parse("/" + route.path);
-    console.log("p", "/" + pathname, "/" + route.path);
+    //console.log("p", "/" + pathname, "/" + route.path);
     const match = regexp.pattern.exec("/" + pathname);
-    console.log("match", match);
+    //console.log("match", match);
     if (match) {
       // Extract the parameters from the matched route
       const params = {};
