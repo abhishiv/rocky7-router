@@ -13,10 +13,12 @@ import {
 import { parse, inject } from "regexparam";
 
 // Example usage
-export type ParentRouteObject = {
-  pathname: string;
-  parents: ParentRouteObject[];
-};
+export type ParentRouteObject =
+  | {
+      pathname: string;
+      parents: ParentRouteObject[];
+    }
+  | undefined;
 export const RouterContext = defineContext<RouterObject>("RouterObject");
 export const ParentRouteContext =
   defineContext<ParentRouteObject>("ParentRouteObject");
@@ -45,12 +47,11 @@ class RouterObject extends EventTarget {
     this.pushState({}, "", path);
   }
   getQuery() {
-    var query = window.location.search.substring(1);
-    var vars = query.split("&");
-    console.log(query, vars);
+    const query = window.location.search.substring(1);
+    const vars = query.split("&");
     const obj: Record<string, string> = {};
-    for (var i = 0; i < vars.length; i++) {
-      var pair = vars[i].split("=");
+    for (let i = 0; i < vars.length; i++) {
+      const pair = vars[i].split("=");
       obj[pair[0]] = decodeURIComponent(pair[1]);
     }
     return obj;
@@ -68,28 +69,16 @@ export const Route = component<{
   path: string;
   component: Component<any> | h.JSX.Element;
 }>("rocky7.Router.Route", (props, { signal, wire, getContext, utils }) => {
-  const ownerRouteSignal = getContext<{ pathname: string }>(ParentRouteContext);
-  //  console.log("ownerRoute", ownerRouteSignal().pathname, props.path);
-  wire(($: any) => {
-    const ownerRoute = ownerRouteSignal($);
-    //  console.log(ownerRoute, props);
-  })();
+  const $ownerRoute = getContext<ParentRouteObject>(ParentRouteContext);
   return (
     <When
-      condition={($) => ownerRouteSignal($).pathname === props.path}
+      condition={($) => $ownerRoute($)?.pathname === props.path}
       views={{
         true: () => h(props.component as any),
         false: () => null,
       }}
     ></When>
   );
-  //    return when(
-  //      ($) => (ownerRouteSignal($).pathname === props.path ? "T" : "F"),
-  //      {
-  //        T: () => h(props.component),
-  //        F: () => <div data-a="4" />,
-  //      }
-  //    );
 });
 
 export const Switch = component(
@@ -98,15 +87,15 @@ export const Switch = component(
     props: { children: VElement[]; onChange?: Function },
     { signal, wire, getContext, createContext, utils }
   ) => {
-    const activeRouteSignal = signal<null | any>("active", null);
+    const $activeRoute = signal<null | any>("active", null);
     // todo: remove typecast
-    createContext(ParentRouteContext, activeRouteSignal as any);
-    const ownerRouteSignal = getContext(ParentRouteContext);
+    createContext(ParentRouteContext, $activeRoute);
+    const $ownerRoute = getContext(ParentRouteContext);
 
-    const routerSignal = getContext(RouterContext);
-    const router = routerSignal();
+    const $router = getContext(RouterContext);
+    const router = $router();
 
-    const ownerRoute = ownerRouteSignal ? ownerRouteSignal() : undefined;
+    const ownerRoute = $ownerRoute ? $ownerRoute() : undefined;
 
     const routes = props.children
       .map((el) => ({
@@ -124,13 +113,14 @@ export const Switch = component(
       route?: { path: string };
       params?: Record<string, string>;
     } = {}) => {
-      //    console.log("updateActiveRoute", route);
+      console.log("updateActiveRoute", route);
       if (route) {
         const currentRoute = {
           pathname: route.path,
           parents: [],
         };
-        activeRouteSignal(currentRoute);
+
+        $activeRoute(currentRoute);
         if (props.onChange) props.onChange(currentRoute);
       }
     };
@@ -165,7 +155,7 @@ function matchRoutes(
   routes: { component: Component; path: string }[]
 ) {
   const pathname = router.location.pathname;
-  //console.debug("matchRoutes", router.location.pathname);
+  console.log("matchRoutes", pathname, routes);
   for (const route of routes) {
     const regexp = parse(route.path);
     const match = regexp.pattern.exec(pathname);
@@ -203,17 +193,16 @@ export const StaticRouter = component("rocky7-router.Static", (props) => {
 export const Link = component(
   "Router.Link",
   (props: any, { signal, wire, getContext }) => {
-    const router = getContext(RouterContext);
-    const activeRoute = getContext(ParentRouteContext);
+    const $router = getContext(RouterContext);
     return (
       <a
         {...props}
         onClick={(e) => {
           e.preventDefault();
-          if (!router) {
+          if (!$router) {
             throw new Error("Please define root router");
           }
-          const r = router();
+          const r = $router();
           r.pushState({}, "", props.href);
           if (props.onClick) {
             props.onClick(e);

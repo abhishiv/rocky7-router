@@ -9,21 +9,22 @@ export const Layout = component<{}>("Layout", (props, {}) => {
       <div>
         <ul>
           <li>
-            <Link href="/">Home</Link>{" "}
+            <Link href="/">Home</Link>
           </li>
           <li>
-            <Link href="/about">About</Link>{" "}
+            <Link href="/about">About</Link>
           </li>
           <li>
-            <Link href="/profile">Profile</Link>{" "}
+            <Link href="/profile">Profile</Link>
           </li>
           <li>
-            <Link href="/profile/settings">Profile Settings</Link>{" "}
+            <Link href="/profile/settings">Profile Settings</Link>
           </li>
         </ul>
         <Switch>
           <Route path="" component={Home} />
           <Route path="about" component={About} />
+          <Route path="profile" component={Profile} />
         </Switch>
       </div>
     </BrowserRouter>
@@ -41,6 +42,7 @@ export const About = component<{}>("About", (props, {}) => {
 export const Profile = component<{}>("Profile", (props, {}) => {
   return (
     <div>
+      profile
       <Switch>
         <Route path="" component={ProfileIndex} />
         <Route path="settings" component={ProfileSettings} />
