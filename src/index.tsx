@@ -16,6 +16,7 @@ export type ParentRouteObject =
   | {
       pathname: string;
       parent: ParentRouteObject;
+      params: Record<string, string>;
     }
   | undefined;
 export const RouterContext = defineContext<RouterObject>("RouterObject");
@@ -84,7 +85,7 @@ export const Switch = component(
   "rocky7.Router.Switch",
   (
     props: { children: VElement[]; onChange?: Function },
-    { signal, wire, getContext, setContext, utils }
+    { signal, wire, getContext, setContext, utils, onUnmount }
   ) => {
     const $activeRoute = signal<null | any>("active", null);
 
@@ -114,6 +115,7 @@ export const Switch = component(
       if (route) {
         const currentRoute: ParentRouteObject = {
           pathname: route.path,
+          params: params || {},
           parent: $ownerRoute ? $ownerRoute() : undefined,
         };
         $activeRoute(currentRoute);
@@ -121,15 +123,17 @@ export const Switch = component(
         if (props.onChange) props.onChange(currentRoute);
       }
     };
-
-    router.addEventListener("popstate", () =>
+    const onPopstate = () =>
       updateActiveRoute(
         matchRoutes($ownerRoute ? $ownerRoute() : undefined, router, routes)
-      )
-    );
+      );
+    router.addEventListener("popstate", onPopstate);
     updateActiveRoute(
       matchRoutes($ownerRoute ? $ownerRoute() : undefined, router, routes)
     );
+    onUnmount(() => {
+      router.removeEventListener("popstate", onPopstate);
+    });
     return props.children as any;
   }
 );
@@ -157,7 +161,11 @@ function matchRoutes(
     //console.log("match", match);
     if (match) {
       // Extract the parameters from the matched route
-      const params = {};
+      const params: any = {};
+
+      regexp.keys.forEach((k, i) => {
+        params[k] = match[i + 1];
+      });
 
       return {
         route,
@@ -198,7 +206,9 @@ export const Link = component(
             throw new Error("Please define root router");
           }
           const r = $router();
-          r.pushState({}, "", props.href);
+          const href =
+            typeof props.href === "function" ? props.href() : props.href;
+          r.pushState({}, "", href);
           if (props.onClick) {
             props.onClick(e);
           }
