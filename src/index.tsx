@@ -7,6 +7,7 @@ import {
   VElement,
   Component,
   When,
+  Signal,
 } from "rocky7";
 //import { pathToRegexp } from "path-to-regex";
 import { parse } from "regexparam";
@@ -19,9 +20,11 @@ export type ParentRouteObject =
       params: Record<string, string>;
     }
   | undefined;
-export const RouterContext = defineContext<RouterObject>("RouterObject");
+
+export const RouterContext =
+  defineContext<Signal<RouterObject>>("RouterObject");
 export const ParentRouteContext =
-  defineContext<ParentRouteObject>("ParentRouteObject");
+  defineContext<Signal<ParentRouteObject>>("ParentRouteObject");
 
 export type History = typeof window.history;
 export type Location = typeof window.location;
@@ -69,7 +72,7 @@ export const Route = component<{
   path: string;
   component: Component<any> | h.JSX.Element;
 }>("rocky7.Router.Route", (props, { signal, wire, getContext, utils }) => {
-  const $ownerRoute = getContext<ParentRouteObject>(ParentRouteContext);
+  const $ownerRoute = getContext(ParentRouteContext);
   return (
     <When
       condition={($) => $ownerRoute($)?.pathname === props.path}
