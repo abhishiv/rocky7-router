@@ -14,7 +14,7 @@ Router for [rocky7](https://github.com/abhishiv/rocky7) inspired by react-router
 
 <table>
   <tr>
-    <td><img align="middle" width="48" src="https://cdn.www.grati.co/versions/v10/favicons/2318440.png"></td>
+    <td><img align="middle" width="48" src="https://www.grati.co/assets/logo-2c341a38.png"></td>
     <td>You might want to try out <a href="https://www.grati.co">grati.co</a>, a no-code programming environment with emacs like extensibility.</td>
   </tr>
 </table>
