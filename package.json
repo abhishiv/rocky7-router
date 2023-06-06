@@ -24,7 +24,8 @@
   "scripts": {
     "build": "npx tsc --resolveJsonModule -p ./tsconfig.json --outDir ./dist/esm && npx tsc --resolveJsonModule -p ./tsconfig.json --module commonjs --outDir ./dist/cjs",
     "test": "npx vitest --run --passWithNoTests",
-    "coverage": "vitest run --coverage --run --passWithNoTests"
+    "coverage": "vitest run --coverage --run --passWithNoTests",
+    "typecheck": "npx tsc --noEmit"
   },
   "main": "./src/index.tsx",
   "exports": {
